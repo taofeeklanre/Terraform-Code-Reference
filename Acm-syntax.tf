@@ -1,4 +1,4 @@
-# request public certificates from the amazon certificate manager.
+# request public certificates from the amazon certificate manager
 resource "aws_acm_certificate" "acm_certificate" {
   domain_name               = 
   subject_alternative_names = 
