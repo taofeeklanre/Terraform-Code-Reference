@@ -1,17 +1,17 @@
 # create database subnet group
 resource "aws_db_subnet_group" "database_subnet_group" {
-  name        = 
+  name        = "${}-${}-database-subnets"
   subnet_ids  = 
   description = "subnets for database instance"
 
   tags = {
-    Name = 
+    Name = "${}-${}-database-subnets"
   }
 }
 
 # get information about a database snapshot
 data "aws_db_snapshot" "latest_db_snapshot" {
-  db_snapshot_identifier =
+  db_snapshot_identifier = 
   most_recent            = 
   snapshot_type          = 
 }

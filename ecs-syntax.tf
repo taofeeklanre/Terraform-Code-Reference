@@ -1,16 +1,17 @@
+
 # create ecs cluster
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name      = 
+  name = "${}-${}-cluster"
 
   setting {
-    name    = "containerInsights"
-    value   = "disabled"
+    name  = "containerInsights"
+    value = "disabled"
   }
 }
 
 # create cloudwatch log group
 resource "aws_cloudwatch_log_group" "log_group" {
-  name = 
+  name = "/ecs/${}-${}-td"
 
   lifecycle {
     create_before_destroy = 
@@ -19,12 +20,12 @@ resource "aws_cloudwatch_log_group" "log_group" {
 
 # create task definition
 resource "aws_ecs_task_definition" "ecs_task_definition" {
-  family                    = 
-  execution_role_arn        = 
-  network_mode              = 
-  requires_compatibilities  = 
-  cpu                       = 
-  memory                    = 
+  family                   = "${}-${}-td"
+  execution_role_arn       = 
+  network_mode             = 
+  requires_compatibilities = 
+  cpu                      = 
+  memory                   = 
 
   runtime_platform {
     operating_system_family = 
@@ -32,32 +33,32 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   }
 
   # create container definition
-  container_definitions     = jsonencode([
+  container_definitions = jsonencode([
     {
-      name                  = 
-      image                 = 
-      essential             = 
+      name      = "${}-${}-container"
+      image     = "${}"
+      essential = 
 
-      portMappings          = [
+      portMappings = [
         {
-          containerPort     = 
-          hostPort          = 
+          containerPort = 
+          hostPort      = 
         }
       ]
 
       environmentFiles = [
         {
-          value = "arn:aws:s3:::<s3-bucket-name>/<env-file-name>"
-          type  = 
+          value = "arn:aws:s3:::${}-${}/${}"
+          type  = "s3"
         }
       ]
-      
+
       logConfiguration = {
-        logDriver      = 
-        options        = {
-          "awslogs-group"          = 
-           "awslogs-region"        = 
-          "awslogs-stream-prefix"  = 
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group"         = "${}",
+          "awslogs-region"        = "${}",
+          "awslogs-stream-prefix" = 
         }
       }
     }
@@ -66,7 +67,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
 
 # create ecs service
 resource "aws_ecs_service" "ecs_service" {
-  name                               = 
+  name                               = "${}-${}-service"
   launch_type                        = 
   cluster                            = 
   task_definition                    = 
@@ -76,20 +77,20 @@ resource "aws_ecs_service" "ecs_service" {
   deployment_maximum_percent         = 
 
   # task tagging configuration
-  enable_ecs_managed_tags            = 
-  propagate_tags                     = 
+  enable_ecs_managed_tags = 
+  propagate_tags          = 
 
   # vpc and security groups
   network_configuration {
-    subnets                 = 
-    security_groups         =  
-    assign_public_ip        = 
+    subnets          = 
+    security_groups  = 
+    assign_public_ip = 
   }
 
   # load balancing
   load_balancer {
-    target_group_arn = 
-    container_name   = 
+    target_group_arn = var.alb_target_group_arn
+    container_name   = "${}-${}-container"
     container_port   = 
   }
 }
